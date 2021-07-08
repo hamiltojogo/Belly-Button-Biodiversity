@@ -1,5 +1,4 @@
-function init() {
-    
+function init() {    
     // add the ids to the drop down menu
     var id = d3.select('#selDataset');
     d3.json('data/samples.json').then((data) => {
@@ -9,8 +8,18 @@ function init() {
             id.append('option').text(name).property('value', name)
         });
         buildCharts(sampleNames[0]);
+        buildMetaData(sampleNames[0]);
     }); 
-
+};
+//call updatePlotly () when a change takes place
+d3.selectAll("#selDataset").on('change', updatePlotly);
+//This function is called when a dropdown menu item is selected
+function updatePlotly() {
+  var dropdownMenu = d3.selectAll("#selDataset");
+  console.log(dropdownMenu);
+  var newID = dropdownMenu.property('value');
+  buildCharts(newID);
+  buildMetaData(newID); 
 };
 
 function buildCharts (name) {
@@ -28,9 +37,7 @@ d3.json('data/samples.json').then((data) => {
         type: 'bar',
         orientation: 'h',
         text: labels.reverse().slice(0,10),
-
     }];
-
     var layout = {
         title: 'Top 10 Bacteria Cultures Found',
         xaxis: {title: 'Sample Size'},
@@ -46,66 +53,33 @@ d3.json('data/samples.json').then((data) => {
         marker: {
           size: sampleValues,
           color:ids,
-
         }
-      };
-    
-      var data = [trace1];
-    
+      };  
+      var data = [trace1];    
       var layout = {
         title: 'Bacteria Cultures Per Sample',
         xaxis: {title: 'OTU ID'},
         showlegend: false,
         };
-  
       Plotly.newPlot('bubble', data, layout);
-
-
 });
 
 };
+// //populate the metadata table 
+// function buildMetaData (name) {
+//   d3.json('data/samples.json').then((data) =>{
+//     var metadata = data.metadata
+//     var demographics = metadata.filter(object=>object.id=== name)
+    
 
-function handleSubmit(){
-    d3.event.preventDefault();
-    var newID = d3.select("#selDataset").node().value;
-    console.log(newID);
-    buildCharts(newID);
-  
-}
-d3.select("#submit").on("click", handleSubmit);
+
+//   });
+// };
+
 init();
 
 
 
-
-
-//bubble chart
-//<div id="bubble"></div>
-// var trace1 = {
-//     x: data.samples.out_ids,
-//     y: data.samples.sample_values,
-//     text:data.samples.out_labels,
-//     mode: 'markers',
-//     marker: {
-//       size: data.samples.sample_values,
-//       color:data.samples.otu_ids,
-
-//     }
-//   };
-  
-//   var data = [trace1];
-  
-//   var layout = {
-//     title: 'Bacteria Cultures Per Sample',
-//     xaxis: {title: 'OTU ID'},
-//     showlegend: false,
-//     };
-  
-//   Plotly.newPlot('bubble', data, layout);
-
-  //Demographic Info
-
-//<div id="sample-metadata" class="panel-body"></div>
 
 
 
