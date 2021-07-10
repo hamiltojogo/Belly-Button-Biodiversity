@@ -26,13 +26,15 @@ function buildCharts (name) {
 // bar chart 
 d3.json('data/samples.json').then((data) => {
     var samples = data.samples
-    var values = samples.filter(object=>object.id=== name)
-    var ids = values[0].otu_ids
-    var labels = values[0].otu_labels
-    var sampleValues = values[0].sample_values
+    var valueArray = samples.filter(object=>object.id=== name)
+    var value = valueArray[0]
+    var ids = value.otu_ids
+    var labels = value.otu_labels
+    var sampleValues = value.sample_values.map((quantity)=>parseInt(quantity))
+    
 
     var data = [{
-        x: sampleValues.reverse().slice(0,10),
+        x: sampleValues.slice(0,10).reverse(),
         y:ids.reverse().slice(0,10).map(otuid=>`OTU ${otuid}`),
         type: 'bar',
         orientation: 'h',
@@ -65,16 +67,21 @@ d3.json('data/samples.json').then((data) => {
 });
 
 };
-// //populate the metadata table 
-// function buildMetaData (name) {
-//   d3.json('data/samples.json').then((data) =>{
-//     var metadata = data.metadata
-//     var demographics = metadata.filter(object=>object.id=== name)
-    
+//populate the metadata table 
+function buildMetaData (name) {
+d3.select("#sample-metadata").selectAll("p").remove();
+d3.json('data/samples.json').then((data) =>{
+  var metadata = data.metadata
+  var filterData = metadata.filter(sampleObject => sampleObject.id == name);
+  var info = filterData[0];
+  var metaTable = d3.select('#sample-metadata');
+  metaTable.html('');
+  Object.entries(info).forEach(([key, value]) => {
+      metaTable.append('p').text(`${key}: ${value}`)
+    });
+  })
+};
 
-
-//   });
-// };
 
 init();
 
